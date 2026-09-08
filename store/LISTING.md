@@ -28,25 +28,25 @@ Screen-time apps tell you how LONG you scrolled. FeedMiles tells you how FAR. Ev
   "1.4 km today  ≈  4.2× the Eiffel Tower"
 
 WHAT IT DOES
-• Measures scrolling on Facebook, Instagram, X/Twitter, TikTok, YouTube, Reddit, LinkedIn, Threads and Pinterest — or any site you add yourself
-• Shows today / 7-day / 30-day / all-time distance with an animated dashboard
-• Real-world comparisons: giraffe → school bus → blue whale → Boeing 747 → Eiffel Tower → Burj Khalifa → Everest → marathon → the Moon
+• Measures how far you scroll on the major social feeds you choose to track — and on any other site you add yourself
+• Shows today, 7-day, 30-day and all-time distance in an animated dashboard
+• Real-world comparisons, from a giraffe and a school bus up to a blue whale, a skyscraper, a mountain, a marathon and the distance to the Moon
 • "Next milestone" progress bar and a daily bar chart
-• Per-site breakdown with share and active-time
+• Per-site breakdown with share of total and active time
 • Toolbar badge with today's total
 • Light and dark mode
 
 GENTLE MILESTONE ALERTS
-Each time today's scrolling passes a real-world object, FeedMiles gives you a nudge: a small card slides in under the toolbar icon, a silent system notification appears, and a soft two-note chime plays (quiet by design, adjustable, each part switchable). Alerts are spaced out so they encourage a break instead of nagging.
+Each time today's scrolling passes a real-world object, FeedMiles gives you a nudge: a small card slides in under the toolbar icon, a silent system notification appears, and a soft two-note chime plays (quiet by design, adjustable, and each part can be switched off). Alerts are spaced out so they encourage a break instead of nagging.
 
 HONEST MEASUREMENT
-Browsers don't reveal a monitor's physical size, so FeedMiles auto-detects it from your resolution, display scaling and platform — and tells you how confident it is. Verify in seconds by holding a bank card against the on-screen outline, or set the size manually. All history is stored in pixels, so changing calibration recalculates everything correctly.
+Browsers don't reveal a monitor's physical size, so FeedMiles auto-detects it from your resolution, display scaling and platform — and tells you how confident it is. Verify in seconds by holding a bank card against the on-screen outline, or set the size manually. History is stored in pixels, so changing the calibration recalculates everything correctly.
 
 PRIVACY FIRST
-Everything stays on your device in the extension's local storage. FeedMiles makes no network requests, has no analytics, no accounts and no tracking. Custom sites ask for permission individually — FeedMiles never requests access to all websites.
+Everything stays on your device in the extension's local storage. FeedMiles makes no network requests and has no analytics, accounts or tracking. Sites you add yourself ask for permission individually — FeedMiles never requests access to all websites.
 
 OPEN SOURCE
-Built with Manifest V3. Source and issues: https://github.com/badruddin-tasnim/feedmiles
+Built with Manifest V3. Source code and support: https://github.com/badruddin-tasnim/feedmiles
 ```
 
 ## Single-purpose statement
@@ -64,7 +64,7 @@ FeedMiles measures how far a user scrolls on social-media sites they choose to t
 | 1 | `store/screenshot-1-popup.png` | Your feed, in kilometers. Today / week / month / all-time. |
 | 2 | `store/screenshot-2-alert.png` | A gentle nudge when you pass the Eiffel Tower. |
 | 3 | `store/screenshot-3-settings.png` | Auto-detects your screen size — verify with a bank card. |
-| 4 | `store/screenshot-4-dark.png` | Dark mode, per-site breakdown, next milestone. |
+| 4 | `store/screenshot-4-dark.png` | Dark mode, per-site breakdown, all-time view. |
 
 Promo assets: `store/promo-small-440x280.png` (required small tile), `store/promo-marquee-1400x560.png` (optional marquee), `store/icon-128.png` (store icon), `icons/icon512.png` (source).
 
@@ -79,3 +79,4 @@ Promo assets: `store/promo-small-440x280.png` (required small tile), `store/prom
 - [ ] Test on a fresh Chrome profile: install → welcome page opens → screen detected → scroll Instagram → badge updates → alert fires
 - [ ] Screenshots are exactly 1280×800 (or 640×400), PNG/JPEG, no rounded corners/transparency
 - [ ] Small promo tile 440×280 present (required for featuring)
+- [ ] No lists of third-party brand names in the description or promo images (the store flags these as keyword spam — rejected once for this, ref "Yellow Argon")
