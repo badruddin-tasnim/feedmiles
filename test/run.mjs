@@ -301,4 +301,11 @@ console.log('\n[4] background.js record + badge');
   t('reset clears data and badge', () => { assert.deepEqual(store.totals, {}); assert.equal(badge.text, ''); });
 }
 
+console.log("\n[5] manifest");
+t("manifest description ≤ 132 chars (Chrome Web Store limit)", () => {
+  const m = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8"));
+  assert.ok(m.description.length <= 132, m.description.length);
+  assert.ok(m.name.length <= 45);
+});
+
 console.log(`\n${passed} checks passed ✅`);
