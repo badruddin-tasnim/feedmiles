@@ -78,13 +78,14 @@ jobs:
           fi
           git tag "$TAG"
           git push origin "$TAG"
-          gh release create "$TAG" feedmiles-store.zip \
-            --title "FeedMiles $TAG" \
-            --notes "Chrome Web Store upload zip (manifest.json at the root).
-
-**Install unpacked:** unzip → chrome://extensions → Developer mode → Load unpacked.
-
-See \`store/LISTING.md\` for the listing copy, \`store/PERMISSIONS.md\` for permission justifications and \`store/PRIVACY.md\` for the privacy policy."
+          {
+            echo "Chrome Web Store upload zip (manifest.json at the root)."
+            echo
+            echo "**Install unpacked:** unzip → chrome://extensions → Developer mode → Load unpacked."
+            echo
+            echo "See store/LISTING.md for the listing copy, store/PERMISSIONS.md for permission justifications and store/PRIVACY.md for the privacy policy."
+          } > /tmp/release-notes.md
+          gh release create "$TAG" feedmiles-store.zip --title "FeedMiles $TAG" --notes-file /tmp/release-notes.md
 
       - name: Try to enable GitHub Pages (main /docs)
         continue-on-error: true
