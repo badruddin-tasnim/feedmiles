@@ -1,0 +1,101 @@
+name: Build store zip & release
+
+# Runs on every push to main. It (1) restores binary assets if missing,
+# (2) builds the Chrome Web Store upload zip, (3) tags + releases the version
+# from manifest.json if that tag doesn't exist yet, (4) tries to enable GitHub
+# Pages for the privacy policy (best-effort; may need a one-time click in Settings).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: v
+        run: echo "version=$(node -p "require('./manifest.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore binary assets (icons, screenshots) if missing
+        env:
+          # Public bundle of icons/*.png + store/*.png (binary files can't be pushed through the
+          # GitHub connector, so the first workflow run restores them from here and commits them).
+          ASSETS_URL: ${{ vars.ASSETS_URL || 'https://pub.hyperagent.com/api/published/pbf01M1ZV0BSQ_R03R8K3H7EB3N4ES/feedmiles-binary-assets.zip' }}
+        run: |
+          if [ ! -f icons/icon128.png ] || [ ! -f store/screenshot-1-popup.png ]; then
+            echo "Binary assets missing — restoring."
+            if [ -n "$ASSETS_URL" ]; then
+              curl -fsSL "$ASSETS_URL" -o /tmp/assets.zip && unzip -o -q /tmp/assets.zip -d . && echo "restored from ASSETS_URL"
+            fi
+            if [ ! -f icons/icon128.png ]; then
+              echo "Generating icons from make_icons.py instead."
+              pip install --quiet pillow && python3 make_icons.py
+            fi
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add icons store || true
+            git commit -m "chore: add binary assets (icons, store images) [skip ci]" || echo "nothing to commit"
+            git push
+          else
+            echo "Binary assets present."
+          fi
+
+      - name: Run tests
+        run: node test/run.mjs
+
+      - name: Build Chrome Web Store upload zip (manifest.json at root)
+        run: |
+          rm -f feedmiles-store.zip
+          zip -r feedmiles-store.zip . \
+            -x ".git/*" ".github/*" "test/*" "store/*" "docs/*" "make_icons.py" "README.md" "LICENSE" "*.zip" "icons/icon512.png"
+          unzip -l feedmiles-store.zip | head -30
+
+      - name: Tag & release if this version isn't released yet
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          TAG="v$VERSION"
+          if git rev-parse "$TAG" >/dev/null 2>&1 || gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists — skipping."
+            exit 0
+          fi
+          git tag "$TAG"
+          git push origin "$TAG"
+          gh release create "$TAG" feedmiles-store.zip \
+            --title "FeedMiles $TAG" \
+            --notes "Chrome Web Store upload zip (manifest.json at the root).
+
+**Install unpacked:** unzip → chrome://extensions → Developer mode → Load unpacked.
+
+See \`store/LISTING.md\` for the listing copy, \`store/PERMISSIONS.md\` for permission justifications and \`store/PRIVACY.md\` for the privacy policy."
+
+      - name: Try to enable GitHub Pages (main /docs)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
+            echo "Pages already enabled."
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" \
+              -f build_type=legacy -f "source[branch]=main" -f "source[path]=/docs" \
+              && echo "Pages enabled" \
+              || echo "::warning::Could not enable Pages with the default token — enable once in Settings → Pages (Deploy from branch: main, /docs)."
+          fi
